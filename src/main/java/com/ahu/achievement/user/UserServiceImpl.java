@@ -28,4 +28,9 @@ public class UserServiceImpl implements UserService {
     public void InsertUser(User user) {
         userRepository.save(user);
     }
+
+    @Override
+    public User findById(String id) {
+        return userRepository.findById(id);
+    }
 }

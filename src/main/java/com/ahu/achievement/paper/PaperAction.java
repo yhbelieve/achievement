@@ -3,18 +3,22 @@ package com.ahu.achievement.paper;
 import com.ahu.achievement.properties.AchievementProperties;
 import com.ahu.achievement.user.User;
 import com.ahu.achievement.utils.MyZipUtils;
-import org.apache.tools.zip.ZipUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class PaperAction {
@@ -38,7 +42,7 @@ public class PaperAction {
      */
     @GetMapping("/showMyAchievement")
     public ModelAndView showMyAchievement(ModelAndView mv, HttpSession session) {
-        User user= (User) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         String filePath = achievementProperties.getFtp_file_name();
         //获取ftp目录下的所以一级目录以及文件
         List<String> fileList = MyZipUtils.traverseChildrenFolder(filePath);
@@ -52,9 +56,30 @@ public class PaperAction {
                 dirList.add(file.substring(file.lastIndexOf("\\") + 1, file.length()));
             }
         }
+
+        List<Paper> paper = paperService.findByAuthorsid(user.getUsername());
+        List showpaper = new ArrayList();
+        for (String paperdirname : dirList) {
+            boolean flag = false;
+            String papername = paperdirname + ".pdf";
+            Map map = new HashMap();
+            for (Paper pa : paper) {
+                if (pa.getPapername().equals(papername)) {
+                    flag = true;
+                }
+            }
+            map.put("dirname", paperdirname);
+            if (flag) {
+                map.put("isexist", 1);//数据库中已经存在
+            } else {
+                map.put("isexist", 0);//新数据，还未入库
+            }
+            showpaper.add(map);
+        }
+
         mv.addObject("zipList", zipList);
-        mv.addObject("dirList", dirList);
-        System.out.println(zipList.toString() + "----" + dirList.toString());
+        mv.addObject("dirList", showpaper);
+//        System.out.println(zipList.toString() + "----" + dirList.toString());
         mv.setViewName("admin/achievement");
         return mv;
     }
@@ -71,7 +96,7 @@ public class PaperAction {
 
         //ftp的根目录
         String filePath = achievementProperties.getFtp_file_name();
-        String file=filePath+zipname;
+        String file = filePath + zipname;
         MyZipUtils.unZip(file, filePath);
         System.out.println("解压成功");
         MyZipUtils.deleteFile(file);
@@ -92,10 +117,117 @@ public class PaperAction {
 
         //ftp的根目录
         String filePath = achievementProperties.getFtp_file_name();
-        String file=filePath+zipname;
+        String file = filePath + zipname;
         MyZipUtils.delete(file);
         System.out.println("删除成功");
         mv.setViewName("redirect:/showMyAchievement");
+        return mv;
+    }
+
+    @GetMapping("/check/{filename}")
+    public ModelAndView check(ModelAndView mv, @PathVariable String filename, HttpSession session) {
+        //获取用户的session的id，姓名与json文件进行对比，对比论文的名称和json文件中的是否一致，并且对比论文的格式是否一致
+        User user = (User) session.getAttribute("user");
+
+        //ftp的根目录
+        String filePath = achievementProperties.getFtp_file_name();
+        String file = filePath + filename;
+        System.out.println(file);
+//        获取文件目录下的文件或者文件夹，然后进行校验
+        Map map = MyZipUtils.traverseFolder(file);
+        List error = new ArrayList();
+        List<String> er = (List) map.get("error");
+        error.addAll(er);
+        System.out.println("map:" + JSON.toJSONString(map));
+        System.out.println(file + "/paperInfo.json");
+//        读取json文件中的信息
+        File jsonfile = new File(file + "/paperInfo.json");
+        if (jsonfile.isFile()) {
+            String content = null;
+            try {
+                content = FileUtils.readFileToString(jsonfile, "UTF-8");
+                Paper paperJson = JSON.parseObject(content, Paper.class);
+                System.out.println("paperJson:" + JSON.toJSONString(paperJson));
+                //判断json文件的数据是否正确
+                if (paperJson.getAuthorsid().isEmpty()) {
+                    error.add("paperInfo.json中学号不能为空");
+                } else if (paperJson.getAuthorsname().isEmpty()) {
+                    error.add("paperInfo.json中作者姓名不能为空");
+                } else if (paperJson.getPaperdesc().isEmpty()) {
+                    error.add("paperInfo.json中论文描述不能为空");
+                } else if (paperJson.getDegreelevel().isEmpty()) {
+                    error.add("paperInfo.json中学位等级不能为空");
+                } else if (paperJson.getPublish().isEmpty()) {
+                    error.add("paperInfo.json中发布时间不能为空");
+                } else if (paperJson.getTags().isEmpty()) {
+                    error.add("paperInfo.json中论文标签不能为空");
+                } else if (!paperJson.getPapername().equals(map.get("papername"))) {
+                    System.out.println("1");
+                    error.add("paperInfo.json中论文名称与您上传的论文名称不一致！");
+                } else if (!paperJson.getPapername().equals(filename + ".pdf")) {
+                    System.out.println("2");
+                    error.add("上传论文的名称与文件夹名不一致");
+                } else if (paperJson.getCode().isEmpty()) {
+                    error.add("code文件夹不能为空");
+                } else if (paperJson.getData().isEmpty()) {
+                    error.add("data文件夹不能为空");
+                } else if (paperJson.getReferences().isEmpty()) {
+                    error.add("references文件夹不能为空");
+                } else if (!paperJson.getAuthorsid().equals(user.getUsername())) {
+                    error.add("paperInfo.json中的学号与您登录的账号不一致！！！");
+                } else if (!paperJson.getAuthorsname().equals(user.getNickname())) {
+                    error.add("paperInfo.json中的姓名与您的账户姓名不一致！！！");
+                }
+                List<String> data = (List<String>) map.get("data");
+                List<String> code = (List<String>) map.get("code");
+                List<String> references = (List<String>) map.get("references");
+//                List<String> others = (List<String>) map.get("others");
+                if (data != null) {
+                    for (Data datajson : paperJson.getData()) {
+                        if (!data.contains(datajson.getDataname())) {
+                            error.add(String.format("paperInfo.json中的%s与data文件夹中的文件名不一致", datajson.getDataname()));
+                        }
+
+                    }
+
+                }
+                if (code != null) {
+                    for (Code codejson : paperJson.getCode()) {
+                        if (!code.contains(codejson.getCodename())) {
+                            error.add(String.format("paperInfo.json中的%s与code文件夹中的文件名不一致", codejson.getCodename()));
+                        }
+
+
+                    }
+                }
+                if (references != null) {
+                    for (References referencesjson : paperJson.getReferences()) {
+                        if (!references.contains(referencesjson.getReferencename())) {
+                            error.add(String.format("paperInfo.json中的%s与references文件夹中的文件名不一致", referencesjson.getReferencename()));
+                        }
+                    }
+                }
+//                for (Others othersjson : paperJson.getOthers()) {
+//                    if (!others.contains(othersjson.getOthersname())) {
+//                        error.add(String.format("others文件夹中的%s文件名与paperInfo.json的不一致", othersjson.getOthersname()));
+//                    }
+//                }
+
+                if (error.size() == 0) {
+                    //存入数据库，显示论文上传成功
+                    paperJson.setIsshow(1);
+                    paperService.savePaper(paperJson);
+                    System.out.println("存入数据库");
+                }
+                System.out.println(JSON.toJSONString(paperJson));
+            } catch (IOException e) {
+                error.add("读取paperInfo.json文件异常");
+            }
+        } else {
+            error.add("文件夹中paperInfo.json文件不存在");
+        }
+        mv.setViewName("admin/check");
+        mv.addObject("error", error);
         return mv;
     }
 
@@ -146,4 +278,45 @@ public class PaperAction {
         paperService.savePaper(paper);
         return "保存成功";
     }
+
+    /**
+     * 显示所有成果列表
+     * @param mv
+     * @return
+     */
+    @GetMapping("showAllAchievement")
+    public ModelAndView showAllAchievement(ModelAndView mv) {
+        List<Paper> paperList=paperService.findAll();
+        mv.addObject("paperList",paperList);
+        mv.setViewName("admin/showAllAchievement");
+        return mv;
+    }
+
+    /**
+     * 成果管理
+     * @param mv
+     * @return
+     */
+    @GetMapping("showEnable/{id}")
+    public ModelAndView showEnable(ModelAndView mv,@PathVariable String id) {
+        Paper paper=paperService.findById(id);
+        paper.setIsshow(0);
+        System.out.println(paper.toString());
+        paperService.savePaper(paper);
+//        mv.addObject("msg","修改成功");
+        mv.setViewName("redirect:/showAllAchievement");
+        return mv;
+    }
+
+    @GetMapping("showDisable/{id}")
+    public ModelAndView showDisable(ModelAndView mv,@PathVariable String id) {
+        Paper paper=paperService.findById(id);
+        paper.setIsshow(1);
+        paperService.savePaper(paper);
+//        mv.addObject("msg","修改成功");
+        mv.setViewName("redirect:/showAllAchievement");
+        return mv;
+    }
+
+
 }

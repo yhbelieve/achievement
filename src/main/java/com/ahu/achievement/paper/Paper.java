@@ -20,11 +20,11 @@ public class Paper {
     private List<Data> data;//实验数据
     private List<References> references;//引文
     private List<Others> others;//其他
-
+    private int isshow;//默认1代表可以在界面上显示，0为管理员审核不通过，不能在界面上显示
     public Paper() {
     }
 
-    public Paper(String id, String authorsname, String authorsid, String papername, String readme, String paperdesc, String publish, String degreelevel, String tutorname, List<Tags> tags, List<Code> code, List<Data> data, List<References> references, List<Others> others) {
+    public Paper(String id, String authorsname, String authorsid, String papername, String readme, String paperdesc, String publish, String degreelevel, String tutorname, List<Tags> tags, List<Code> code, List<Data> data, List<References> references, List<Others> others, int isshow) {
         this.id = id;
         this.authorsname = authorsname;
         this.authorsid = authorsid;
@@ -39,6 +39,15 @@ public class Paper {
         this.data = data;
         this.references = references;
         this.others = others;
+        this.isshow = isshow;
+    }
+
+    public int getIsshow() {
+        return isshow;
+    }
+
+    public void setIsshow(int isshow) {
+        this.isshow = isshow;
     }
 
     public String getId() {

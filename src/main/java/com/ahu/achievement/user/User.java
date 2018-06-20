@@ -6,20 +6,14 @@ import javax.annotation.Generated;
 
 public class User {
     @Id
-    private Long id;
+    private String id;
 //    username为学号
     private String username;
     private String password;
     private Integer level;
     private String nickname;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;
@@ -56,11 +50,19 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String username, String password, Integer level, String nickname) {
+    public User(String id, String username, String password, Integer level, String nickname) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.level = level;
         this.nickname = nickname;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

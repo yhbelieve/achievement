@@ -6,4 +6,5 @@ public interface UserService {
     User findByUsernameAndPassword(String username, String password);
     List<User> findAll();
     void InsertUser(User user);
+    User findById(String id);
 }

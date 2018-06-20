@@ -3,10 +3,10 @@ package com.ahu.achievement.utils;
 
 import java.io.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.support.hsf.HSFJSONUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
@@ -201,7 +201,10 @@ public class MyZipUtils {
 //        System.out.println("********执行成功**********");
 //        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
 //        System.out.println("解压速度为："+length/(endTime-startTime)+"/ms");
-        traverseChildrenFolder("F:\\download\\");
+        Map map = traverseFolder("E:/ftp_file/机器学习_E1876723827/");
+        JSON.toJSONString(map);
+
+        System.out.println(JSON.toJSONString(map));
 
     }
 
@@ -235,8 +238,8 @@ public class MyZipUtils {
      *
      * @param path
      */
-    public static void traverseFolder(String path) {
-
+    public static void traverseFolder1(String path) {
+        List<String> list = new ArrayList<>();
         File file = new File(path);
         if (file.exists()) {
             File[] files = file.listFiles();
@@ -247,8 +250,10 @@ public class MyZipUtils {
                 for (File file2 : files) {
                     if (file2.isDirectory()) {
                         System.out.println("文件夹:" + file2.getAbsolutePath());
+                        list.add(file2.getName());
                         traverseFolder(file2.getAbsolutePath());
                     } else {
+                        list.add(file2.getName());
                         System.out.println("文件:" + file2.getAbsolutePath());
                     }
                 }
@@ -256,8 +261,133 @@ public class MyZipUtils {
         } else {
             System.out.println("文件不存在!");
         }
+        System.out.println("读取的文件详细为：" + list.toString());
     }
 
+    /**
+     * 读取以及检验上传的文件格式
+     * @param path
+     * @return
+     */
+    public static Map<String, String> traverseFolder(String path) {
+        Map paperMap = new HashMap();
+        File file = new File(path);
+        List error = new ArrayList();
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files.length == 0) {
+                System.out.println("文件夹是空的!");
+                error.add("上传文件夹是空的！！！");
+                paperMap.put("error", error);
+                return paperMap;
+            } else {
+                for (File file2 : files) {
+                    if (file2.isDirectory()) {
+                        if (file2.getName().equals("code")) {
+                            List code = new ArrayList();
+                            for (File file1 : file2.listFiles()) {
+                                if (file1.isDirectory()) {
+                                    String errorInfo = String.format("[%s]文件夹中文件不应该包含文件夹[%s]" ,file2.getName() , file1.getName());
+                                    error.add(errorInfo);
+                                } else if (file1.getName().endsWith(".zip")) {
+                                    code.add(file1.getName());
+                                } else {
+                                    String errorInfo = String.format("[%s]文件夹中文件[%s]的后缀名不是zip" ,file2.getName() , file1.getName());
+                                    error.add(errorInfo);
+                                }
+                                paperMap.put("code", code);
+                            }
+                        } else if (file2.getName().equals("data")) {
+                            List data = new ArrayList();
+                            for (File file1 : file2.listFiles()) {
+                                if (file1.isDirectory()) {
+                                    String errorInfo = String.format("[%s]文件夹中文件不应该包含文件夹[%s]" , file2.getName() ,file1.getName());
+                                    error.add(errorInfo);
+                                } else if (file1.getName().endsWith(".zip")) {
+                                    data.add(file1.getName());
+                                } else {
+                                    String errorInfo = String.format("[%s]文件夹中文件[%s]的后缀名不是zip" , file2.getName() ,file1.getName());
+                                    error.add(errorInfo);
+                                }
+                                paperMap.put("data", data);
+                            }
+                        } else if (file2.getName().equals("others")) {
+                            List others = new ArrayList();
+                            for (File file1 : file2.listFiles()) {
+                                if (file1.isDirectory()) {
+                                    String errorInfo = String.format("[%s]文件夹中文件不应该包含文件夹[%s]" , file2.getName() ,file1.getName());
+                                    error.add(errorInfo);
+                                } else if (file1.getName().endsWith(".zip")) {
+                                    others.add(file1.getName());
+                                } else {
+                                    String errorInfo = String.format("[%s]文件夹中文件[%s]的后缀名不是zip" ,file2.getName() ,file1.getName());
+                                    error.add(errorInfo);
+                                }
+                                paperMap.put("others", others);
+                            }
+                        } else if (file2.getName().equals("references")) {
+                            List references = new ArrayList();
+                            for (File file1 : file2.listFiles()) {
+                                if (file1.isDirectory()) {
+                                    String errorInfo = String.format("[%s]文件夹中文件不应该包含文件夹[%s]" , file2.getName() ,file1.getName());
+                                    error.add(errorInfo);
+                                } else if (file1.getName().endsWith(".pdf")) {
+                                    references.add(file1.getName());
+                                } else {
+                                    String errorInfo = String.format("[%s]文件夹中文件[%s]的后缀名不是pdf" , file2.getName() , file1.getName());
+                                    error.add(errorInfo);
+                                }
+                                paperMap.put("references", references);
+                            }
+                        } else {
+                            String errorInfo = String.format("文件根目录不应该包含文件夹[%s]" , file2.getName());
+                            error.add(errorInfo);
+                        }
+
+
+                    } else {
+                        if (file2.getName().endsWith(".md")) {
+                            paperMap.put("readme", file2.getName());
+                        } else if (file2.getName().endsWith(".pdf")) {
+                            paperMap.put("papername", file2.getName());
+                        } else if (file2.getName().endsWith(".json")) {
+                            paperMap.put("paperInfo", file2.getName());
+                        } else {
+                            String errorInfo = String.format("文件夹根目录中多余文件[%s]" , file2.getName()) ;
+                            error.add(errorInfo);
+                        }
+                    }
+
+                }
+            }
+        } else {
+            String errorInfo = "文件不存在!" ;
+            error.add(errorInfo);
+        }
+
+        Set<String> set = paperMap.keySet(); //取出所有的key值
+        List<String> checkfile=new ArrayList();
+        List<String> checkdir=new ArrayList();
+        checkdir.add("code");
+        checkdir.add("data");
+        checkdir.add("references");
+        checkfile.add("paperInfo");
+        checkfile.add("papername");
+        checkdir.add("others");
+        checkfile.add("readme");
+        for (String chdir:checkdir){
+            if(!set.contains(chdir)){
+                error.add(String.format("上传的文件中文件夹%s丢失",chdir));
+            }
+        }
+        for (String chfile:checkfile){
+            if(!set.contains(chfile)){
+                error.add(String.format("上传的文件中文件%s丢失",chfile));
+            }
+        }
+        paperMap.put("error",error);
+        return paperMap;
+    }
 
     /**
      * 删除文件或者文件夹
@@ -279,8 +409,7 @@ public class MyZipUtils {
     /**
      * 删除单个文件
      *
-     * @param fileName
-     *            要删除的文件的文件名
+     * @param fileName 要删除的文件的文件名
      * @return 单个文件删除成功返回true，否则返回false
      */
     public static boolean deleteFile(String fileName) {
@@ -303,8 +432,7 @@ public class MyZipUtils {
     /**
      * 删除目录及目录下的文件
      *
-     * @param dir
-     *            要删除的目录的文件路径
+     * @param dir 要删除的目录的文件路径
      * @return 目录删除成功返回true，否则返回false
      */
     public static boolean deleteDirectory(String dir) {

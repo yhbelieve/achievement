@@ -45,49 +45,7 @@
     <!-- Navigation -->
     <div th:replace="/admin/head::head"></div>
     <div id="page-wrapper">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default" th:unless="${#lists.isEmpty(zipList)}">
-                    <div class="panel-heading">
-                        研究成果压缩包列表
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                <tr>
-                                    <th>研究成果压缩包</th>
-                                    <th>解压缩</th>
-                                    <th>删除</th>
-                                </tr>
-                                </tr>
-                                </thead>
-                                <tbody>
 
-                                <tr th:each="zip:${zipList}">
-                                    <td th:text="${zip}"></td>
-                                    <td><a th:href="@{/unZip/{zipname}(zipname=${zip})}">
-                                        <button type="button" class="btn btn-success btn-circle"><i
-                                                class="fa fa-link"></i></button>
-                                    </a></td>
-                                    <td><a th:href="@{/deleteZip/{zipname}(zipname=${zip})}">
-                                        <button type="button" class="btn btn-danger btn-circle"><i
-                                                class="fa fa-times"></i></button>
-                                    </a></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.table-responsive -->
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-
-        </div>
         <!-- /.row -->
         <div class="row">
             <div class="col-lg-12">
@@ -102,26 +60,34 @@
                             <thead>
                             <tr>
                                 <th>成果名称</th>
-                                <th>校验格式</th>
-                                <!--<th>修改</th>-->
+                                <th>作者</th>
+                                <th>状态</th>
+                                <th>操作</th>
 
                             </tr>
                             </thead>
                             <tbody>
-                            <tr class="odd gradeX" th:each="dir:${dirList}">
-                                <td th:text="${dir.dirname}"></td>
-                                <td th:if="${dir.isexist==0}">
-                                    <a th:href="@{/check/{filename}(filename=${dir.dirname})}">
-                                        <button type="button" class="btn btn-info"><i
-                                                class="fa fa-search"></i><span>校验</span></button>
-                                    </a>
-                                </td>
-                                <td th:if="${dir.isexist==1}">
-                                    <a th:href="@{/check/{filename}(filename=${dir.dirname})}">
-                                        <button type="button" class="btn btn-success"><i
-                                                class="fa fa-check"></i><span>重新校验</span></button>
-                                    </a>
-                                </td>
+                            <tr class="odd gradeX" th:each="paper:${paperList}">
+                                <td ><a th:href="@{/showPaperById/{id}(id=${paper.id})}"><p th:text="${#strings.substringBefore(paper.papername,'.')}" ></p></a></td>
+                                <td th:text="${paper.authorsname}"></td>
+
+                                <!--<td th:text="${paper.isshow}"></td>-->
+                                <td th:if="${paper.isshow==1}">首页可见</td>
+                                <td th:if="${paper.isshow==0}">首页不可见</td>
+                                <td th:if="${paper.isshow==1}"><a th:href="@{/showEnable/{id}(id=${paper.id})}">不显示</a></td>
+                                <td th:if="${paper.isshow==0}"><a th:href="@{/showDisable/{id}(id=${paper.id})}">显示</a></td>
+                                <!--<td th:if="${dir.isexist==0}">-->
+                                    <!--<a th:href="@{/check/{filename}(filename=${dir.dirname})}">-->
+                                        <!--<button type="button" class="btn btn-info"><i-->
+                                                <!--class="fa fa-search"></i><span>校验</span></button>-->
+                                    <!--</a>-->
+                                <!--</td>-->
+                                <!--<td th:if="${dir.isexist==1}">-->
+                                    <!--<a th:href="@{/check/{filename}(filename=${dir.dirname})}">-->
+                                        <!--<button type="button" class="btn btn-success"><i-->
+                                                <!--class="fa fa-check"></i><span>重新校验</span></button>-->
+                                    <!--</a>-->
+                                <!--</td>-->
                                 <!--<td>-->
                                     <!--<button type="button" class="btn btn-warning "><i-->
                                             <!--class="fa fa-edit"></i><span>删除</span></button>-->
