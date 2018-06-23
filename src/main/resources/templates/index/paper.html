@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>Black &amp; White</title>
+
+    <!-- meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- css -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="/css/pace.css">
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <!-- js -->
+    <script src="/js/jquery-2.1.3.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/pace.min.js"></script>
+    <script src="/js/modernizr.custom.js"></script>
+</head>
+
+<body id="single">
+<div class="container">
+    <header id="site-header">
+        <div class="row">
+            <div class="col-md-4 col-sm-5 col-xs-8">
+                <div class="logo">
+                    <h1><a href="index.html">成果管理系统</a></h1>
+                </div>
+            </div><!-- col-md-4 -->
+            <div class="col-md-8 col-sm-7 col-xs-4">
+                <nav class="main-nav" role="navigation">
+                    <div class="navbar-header">
+                        <button type="button" id="trigger-overlay" class="navbar-toggle">
+                            <span class="ion-navicon"></span>
+                        </button>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="cl-effect-11"><a href="index.html" data-hover="首页">首页</a></li>
+                            <li class="cl-effect-11"><a href="about.html" data-hover="登录" th:href="@{login}">登录</a></li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </nav>
+
+            </div><!-- col-md-8 -->
+        </div>
+    </header>
+</div>
+
+<div class="content-body">
+    <div class="container">
+        <div class="row">
+            <main class="col-md-8">
+                <article class="post post-1">
+                    <header class="entry-header">
+                        <h1 class="entry-title" th:text="${paper.papername}"></h1>
+                        <div class="entry-meta">
+                            <span class="post-category"><a href="#" th:text="${paper.publish}"></a></span>
+                            <!--<span class="post-date"><a href="#"><time class="entry-date"-->
+                                                                      <!--datetime="2012-11-09T23:15:57+00:00">2017年5月11日</time></a></span>-->
+                            <span class="post-author"><a href="#" th:text="${paper.degreelevel}"></a></span>
+                            <!--<span class="comments-link"><a href="#">4 评论</a></span>-->
+                            <!--<span class="views-count"><a href="#">588 阅读</a></span>-->
+                        </div>
+                    </header>
+                    <div class="entry-content clearfix">
+                        <p>作者：<span  th:text="${paper.authorsname}"></span></p>
+                        <p>标签：<span th:each="tag1:${paper.tags}" th:text="${tag1.tag+';'}"></span></p>
+                        <p>简介：</p>
+                        <blockquote><p th:text="${paper.paperdesc}"></p>
+                        </blockquote>
+                        <h3>引文</h3>
+                        <p th:each="reference,ref_ind:${paper.references}"><span th:text="${ref_ind.index+1+'.'}"></span><a th:text="${#strings.substringBefore(reference.referencename,'.')}"  ></a><span th:text="${ref_tag.tag+';'}" th:each="ref_tag:${reference.tags}"></span></p>
+
+                    </div>
+                </article>
+
+            </main>
+            <aside class="col-md-4">
+                <div class="widget widget-recent-posts">
+                    <h3 class="widget-title">最新论文</h3>
+                    <ul>
+                        <li>
+                            <a href="#">论文1</a>
+                        </li>
+                        <li>
+                            <a href="#">论文2</a>
+                        </li>
+                        <li>
+                            <a href="#">论文3</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="widget widget-archives">
+                    <h3 class="widget-title">归档</h3>
+                    <ul>
+                        <li>
+                            <a href="#">2017 年 5 月</a>
+                        </li>
+                        <li>
+                            <a href="#">2017 年 4 月</a>
+                        </li>
+                        <li>
+                            <a href="#">2017 年 3 月</a>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+                <div class="widget widget-tag-cloud">
+                    <h3 class="widget-title">标签云</h3>
+                    <ul>
+                        <li>
+                            <a href="#">标签1</a>
+                        </li>
+                        <li>
+                            <a href="#">标签2</a>
+                        </li>
+                        <li>
+                            <a href="#">标签3</a>
+                        </li>
+                        <li>
+                            <a href="#">标签4</a>
+                        </li>
+                        <li>
+                            <a href="#">标签5</a>
+                        </li>
+                        <li>
+                            <a href="#">标签6</a>
+                        </li>
+                        <li>
+                            <a href="#">标签7</a>
+                        </li>
+                        <li>
+                            <a href="#">标签8</a>
+                        </li>
+                        <li>
+                            <a href="#">标签9</a>
+                        </li>
+                        <li>
+                            <a href="#">标签10</a>
+                        </li>
+                        <li>
+                            <a href="#">标签8</a>
+                        </li>
+                        <li>
+                            <a href="#">标签9</a>
+                        </li>
+                        <li>
+                            <a href="#">标签10</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+</div>
+<footer id="site-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <p class="copyright">&copy 2018 - 实验室成果
+                    -
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Mobile Menu -->
+<div class="overlay overlay-hugeinc">
+    <button type="button" class="overlay-close"><span class="ion-ios-close-empty"></span></button>
+    <nav>
+        <ul>
+            <li><a href="index.html">首页</a></li>
+            <li><a href="full-width.html">博客</a></li>
+            <li><a href="about.html">关于</a></li>
+            <li><a href="contact.html">联系</a></li>
+        </ul>
+    </nav>
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

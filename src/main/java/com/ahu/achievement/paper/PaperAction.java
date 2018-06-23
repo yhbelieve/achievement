@@ -15,10 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class PaperAction {
@@ -280,26 +277,53 @@ public class PaperAction {
     }
 
     /**
-     * 显示所有成果列表
+     * 后台显示所有成果列表
+     *
      * @param mv
      * @return
      */
     @GetMapping("showAllAchievement")
     public ModelAndView showAllAchievement(ModelAndView mv) {
-        List<Paper> paperList=paperService.findAll();
-        mv.addObject("paperList",paperList);
+        List<Paper> paperList = paperService.findAll();
+        mv.addObject("paperList", paperList);
         mv.setViewName("admin/showAllAchievement");
         return mv;
     }
 
     /**
+     * 首页显示所有成果列表
+     *
+     * @param mv
+     * @return
+     */
+    @GetMapping(value = {"/", "/index"})
+    public ModelAndView index(ModelAndView mv) {
+        List<Paper> paperList = paperService.findAll();
+        List<Tags> tagsList = new ArrayList<>();
+        for (Paper pa : paperList) {
+            tagsList.addAll(pa.getTags());
+            for (References re : pa.getReferences()) {
+                tagsList.addAll(re.getTags());
+            }
+        }
+        HashSet h = new HashSet(tagsList);
+        tagsList.clear();
+        tagsList.addAll(h);
+        mv.addObject("paperList", tagsList);
+        mv.addObject("paperList", paperList);
+        mv.setViewName("index/index");
+        return mv;
+    }
+
+    /**
      * 成果管理
+     *
      * @param mv
      * @return
      */
     @GetMapping("showEnable/{id}")
-    public ModelAndView showEnable(ModelAndView mv,@PathVariable String id) {
-        Paper paper=paperService.findById(id);
+    public ModelAndView showEnable(ModelAndView mv, @PathVariable String id) {
+        Paper paper = paperService.findById(id);
         paper.setIsshow(0);
         System.out.println(paper.toString());
         paperService.savePaper(paper);
@@ -309,12 +333,28 @@ public class PaperAction {
     }
 
     @GetMapping("showDisable/{id}")
-    public ModelAndView showDisable(ModelAndView mv,@PathVariable String id) {
-        Paper paper=paperService.findById(id);
+    public ModelAndView showDisable(ModelAndView mv, @PathVariable String id) {
+        Paper paper = paperService.findById(id);
         paper.setIsshow(1);
         paperService.savePaper(paper);
 //        mv.addObject("msg","修改成功");
         mv.setViewName("redirect:/showAllAchievement");
+        return mv;
+    }
+
+    /**
+     * 按照id显示论文具体内容
+     *
+     * @param mv
+     * @param id
+     * @return
+     */
+    @GetMapping("showOnePaper/{id}")
+    public ModelAndView showOnePaper(ModelAndView mv, @PathVariable String id) {
+        Paper paper = paperService.findById(id);
+
+        mv.addObject("paper", paper);
+        mv.setViewName("index/paper");
         return mv;
     }
 
