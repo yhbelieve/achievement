@@ -68,7 +68,7 @@
                             </thead>
                             <tbody>
                             <tr class="odd gradeX" th:each="paper:${paperList}">
-                                <td ><a th:href="@{/showPaperById/{id}(id=${paper.id})}"><p th:text="${#strings.substringBefore(paper.papername,'.')}" ></p></a></td>
+                                <td ><a th:href="@{/showOnePaper/{id}(id=${paper.id})}"><p th:text="${#strings.substringBefore(paper.papername,'.')}" ></p></a></td>
                                 <td th:text="${paper.authorsname}"></td>
 
                                 <!--<td th:text="${paper.isshow}"></td>-->

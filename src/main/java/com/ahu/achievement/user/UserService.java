@@ -7,4 +7,5 @@ public interface UserService {
     List<User> findAll();
     void InsertUser(User user);
     User findById(String id);
+    List<User> findByUsername(String username);
 }

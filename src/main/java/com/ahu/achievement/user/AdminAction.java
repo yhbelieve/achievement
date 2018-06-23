@@ -20,7 +20,7 @@ public class AdminAction {
      */
     @GetMapping(value = {"/adminLogin", "/userLogin", "/login"})
     public ModelAndView index_get(ModelAndView mv) {
-        System.out.println("跳转登陆界面");
+//        System.out.println("跳转登陆界面");
         mv.setViewName("admin/login");
         return mv;
     }
@@ -32,13 +32,14 @@ public class AdminAction {
         System.out.println(username + "::" + password);
         User user1 = userService.findByUsernameAndPassword(username, password);
 //        userService.
-        System.out.println(user1);
+//        System.out.println(user1);
         if (user1 == null) {
             mv.addObject("user", user);
+            mv.addObject("msg", "用户名或者密码错误！！！如有问题，请联系管理员");
             mv.setViewName("admin/login");
         } else {
             session.setAttribute("user", user1);
-            mv.setViewName("admin/index");
+            mv.setViewName("redirect:/showAdminIndex");
         }
         return mv;
     }
@@ -75,9 +76,13 @@ public class AdminAction {
     public String addUser() {
 
         User user1 = new User("1", "admin", "123456", 1, "系统管理员");
-        userService.InsertUser(user1);
-        User user = new User("2", "user", "123456", 0, "测试用户1");
+        User user = new User();
+        user.setUsername("admin");
+        user.setPassword("123456");
+        user.setLevel(1);
+        user.setNickname("系统管理员");
         userService.InsertUser(user);
+//
         return "用户添加成功";
     }
 
@@ -109,7 +114,7 @@ public class AdminAction {
             user.setPassword(newpassword);
             userService.InsertUser(user);
             mv.addObject("msg", "密码修改成功，退出系统后请用新密码登录");
-            mv.setViewName("admin/index");
+            mv.setViewName("redirect:/showAdminIndex");
             return mv;
         }
     }
@@ -129,6 +134,8 @@ public class AdminAction {
             mv.setViewName("admin/addUser");
             return mv;
         } else {
+            List<User> userList=userService.findByUsername(userid);
+            if(userList.size()==0){
             user.setPassword(userid);
             user.setUsername(userid);
             user.setNickname(username);
@@ -136,6 +143,11 @@ public class AdminAction {
             userService.InsertUser(user);
             mv.addObject("msg", "新用户添加成功");
             mv.setViewName("redirect:/showUserList");
+
+            }else {
+                mv.addObject("msg", "学号已经添加过了，请不要重复添加！！！");
+                mv.setViewName("admin/addUser");
+            }
             return mv;
         }
     }

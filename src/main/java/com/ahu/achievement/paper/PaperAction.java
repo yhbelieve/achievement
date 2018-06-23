@@ -228,6 +228,12 @@ public class PaperAction {
         return mv;
     }
 
+
+    /**
+     * 添加测试用例
+     * @param mv
+     * @return
+     */
     @GetMapping("/savepaper")
     public String savePaper(ModelAndView mv) {
         Paper paper = new Paper();
@@ -306,14 +312,73 @@ public class PaperAction {
                 tagsList.addAll(re.getTags());
             }
         }
-        HashSet h = new HashSet(tagsList);
-        tagsList.clear();
-        tagsList.addAll(h);
-        mv.addObject("paperList", tagsList);
+        HashSet<String> h = new HashSet();
+        for (Tags tag11 : tagsList) {
+            h.add(tag11.getTag());
+        }
+        List list = new ArrayList();
+        for (String tag : h) {
+            Map map = new HashMap();
+            map.put("label", tag);
+            String url = "searchTags/" + tag;
+            map.put("url", url);
+            map.put("target", "_top");
+            list.add(map);
+
+        }
+//        System.out.println(JSON.toJSONString(list));
+        mv.addObject("tagList", JSON.toJSON(list));
         mv.addObject("paperList", paperList);
         mv.setViewName("index/index");
         return mv;
     }
+
+    /**
+     * 按照标签查找
+     *
+     * @param mv
+     * @param tags
+     * @return
+     */
+    @GetMapping("searchTags/{tags}")
+    public ModelAndView searchTags(ModelAndView mv, @PathVariable String tags) {
+        List<Paper> findBytagsList = new ArrayList<>();
+        List<Paper> paperList = paperService.findAll();
+        List<Tags> tagsList = new ArrayList<>();
+        for (Paper pa : paperList) {
+            List<Tags> tagsList1 = pa.getTags();
+            for (Tags tag : tagsList1) {
+                if (tag.getTag().equals(tags)) {
+                    findBytagsList.add(pa);
+                }
+
+            }
+            tagsList.addAll(pa.getTags());
+            for (References re : pa.getReferences()) {
+                tagsList.addAll(re.getTags());
+            }
+        }
+        HashSet<String> h = new HashSet();
+        for (Tags tag11 : tagsList) {
+            h.add(tag11.getTag());
+        }
+        System.out.println(JSON.toJSONString(h));
+        List list = new ArrayList();
+        for (String tag : h) {
+            Map map = new HashMap();
+            map.put("label", tag);
+            String url = "" + tag;
+            map.put("url", url);
+            map.put("target", "_top");
+            list.add(map);
+
+        }
+        mv.addObject("tagList", JSON.toJSON(list));
+        mv.addObject("paperList", findBytagsList);
+        mv.setViewName("index/index");
+        return mv;
+    }
+
 
     /**
      * 成果管理
@@ -354,9 +419,63 @@ public class PaperAction {
         Paper paper = paperService.findById(id);
 
         mv.addObject("paper", paper);
+
+        List<Paper> paperList = paperService.findAll();
+        List<Tags> tagsList = new ArrayList<>();
+        for (Paper pa : paperList) {
+            tagsList.addAll(pa.getTags());
+            for (References re : pa.getReferences()) {
+                tagsList.addAll(re.getTags());
+            }
+        }
+        HashSet<String> h = new HashSet();
+        for (Tags tag11 : tagsList) {
+            h.add(tag11.getTag());
+        }
+        List list = new ArrayList();
+        for (String tag : h) {
+            Map map = new HashMap();
+            map.put("label", tag);
+            String url = "/searchTags/" + tag;
+            map.put("url", url);
+            map.put("target", "_top");
+            list.add(map);
+
+        }
+        mv.addObject("tagList", JSON.toJSON(list));
         mv.setViewName("index/paper");
         return mv;
     }
+    @GetMapping("showAdminIndex")
+    public ModelAndView showAdminIndex(ModelAndView mv,String msg){
+        List<Paper> paperList = paperService.findAll();
+        List<Tags> tagsList = new ArrayList<>();
+        for (Paper pa : paperList) {
+            tagsList.addAll(pa.getTags());
+            for (References re : pa.getReferences()) {
+                tagsList.addAll(re.getTags());
+            }
+        }
+        HashSet<String> h = new HashSet();
+        for (Tags tag11 : tagsList) {
+            h.add(tag11.getTag());
+        }
+        List list = new ArrayList();
+        for (String tag : h) {
+            Map map = new HashMap();
+            map.put("label", tag);
+            String url = "/searchTags/" + tag;
+            map.put("url", url);
+            map.put("target", "_top");
+            list.add(map);
+
+        }
+        mv.addObject("tagList", JSON.toJSON(list));
+        mv.addObject("msg", msg);
+        mv.setViewName("admin/index");
+        return mv;
+    }
+
 
 
 }

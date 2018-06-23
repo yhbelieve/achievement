@@ -10,4 +10,5 @@ public interface PaperRepository extends MongoRepository<Paper,Long> {
     Paper findByAuthorsidAndPapername(String authorsid ,String papername);
     Paper findById(String id);
     Paper save(Paper paper);
+
 }

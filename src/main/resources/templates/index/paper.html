@@ -8,7 +8,6 @@
     <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <!-- css -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
@@ -20,6 +19,54 @@
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/pace.min.js"></script>
     <script src="/js/modernizr.custom.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/zzsc-demo.css">
+    <style type="text/css">
+        #tag-cloud{
+            width:360px;
+            height:260px;
+            margin: 0px auto;
+        }
+    </style>
+
+
+    <script src="/js/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.svg3dtagcloud.min.js"></script>
+    <script th:inline="javascript">
+        $( document ).ready( function() {
+
+            /*<![CDATA[*/
+            var entries  = [[${tagList}]];
+            /*]]>*/
+            var settings = {
+
+                entries: entries,
+                width: 360,
+                height: 267,
+                radius: '65%',
+                radiusMin: 75,
+                bgDraw: true,
+                bgColor: '#fff',
+                opacityOver: 1.00,
+                opacityOut: 0.05,
+                opacitySpeed: 6,
+                fov: 800,
+                speed: 0.5,
+                fontFamily: 'Oswald, Arial, sans-serif',
+                fontSize: '15',
+                fontColor: '#000000',
+                fontWeight: 'normal',//bold
+                fontStyle: 'normal',//italic
+                fontStretch: 'normal',//wider, narrower, ultra-condensed, extra-condensed, condensed, semi-condensed, semi-expanded, expanded, extra-expanded, ultra-expanded
+                fontToUpperCase: true
+
+            };
+
+            //var svg3DTagCloud = new SVG3DTagCloud( document.getElementById( 'holder'  ), settings );
+            $( '#tag-cloud' ).svg3DTagCloud( settings );
+
+        } );
+
+    </script>
 </head>
 
 <body id="single">
@@ -28,7 +75,7 @@
         <div class="row">
             <div class="col-md-4 col-sm-5 col-xs-8">
                 <div class="logo">
-                    <h1><a href="index.html">成果管理系统</a></h1>
+                    <h1><a href="#" th:href="@{/index}">成果管理系统</a></h1>
                 </div>
             </div><!-- col-md-4 -->
             <div class="col-md-8 col-sm-7 col-xs-4">
@@ -41,8 +88,11 @@
 
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="cl-effect-11"><a href="index.html" data-hover="首页">首页</a></li>
-                            <li class="cl-effect-11"><a href="about.html" data-hover="登录" th:href="@{login}">登录</a></li>
+                            <li class="cl-effect-11"><a href="#" th:href="@{/index}" data-hover="首页">首页</a></li>
+                            <li class="cl-effect-11"><a href="about.html" data-hover="登录" th:href="@{/login}" th:if="${session.user==null}">登录</a>
+                                <a href="about.html" th:text="${session.user.username}" th:href="@{/showAdminIndex}" th:if="${session?.user?.level==0}"></a>
+                                <a href="about.html" th:text="${session.user.username}" th:href="@{/showAdminIndex}" th:if="${session?.user?.level==1}"></a>
+                            </li>
                         </ul>
                     </div><!-- /.navbar-collapse -->
                 </nav>
@@ -82,80 +132,41 @@
 
             </main>
             <aside class="col-md-4">
-                <div class="widget widget-recent-posts">
-                    <h3 class="widget-title">最新论文</h3>
-                    <ul>
-                        <li>
-                            <a href="#">论文1</a>
-                        </li>
-                        <li>
-                            <a href="#">论文2</a>
-                        </li>
-                        <li>
-                            <a href="#">论文3</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="widget widget-archives">
-                    <h3 class="widget-title">归档</h3>
-                    <ul>
-                        <li>
-                            <a href="#">2017 年 5 月</a>
-                        </li>
-                        <li>
-                            <a href="#">2017 年 4 月</a>
-                        </li>
-                        <li>
-                            <a href="#">2017 年 3 月</a>
-                        </li>
-                    </ul>
-                </div>
-
+                <!--<div class="widget widget-recent-posts">-->
+                    <!--<h3 class="widget-title">最新论文</h3>-->
+                    <!--<ul>-->
+                        <!--<li>-->
+                            <!--<a href="#">论文1</a>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<a href="#">论文2</a>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<a href="#">论文3</a>-->
+                        <!--</li>-->
+                    <!--</ul>-->
+                <!--</div>-->
+                <!--<div class="widget widget-archives">-->
+                <!--<h3 class="widget-title">归档</h3>-->
+                <!--<ul>-->
+                <!--<li>-->
+                <!--<a href="#">2017 年 5 月</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                <!--<a href="#">2017 年 4 月</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                <!--<a href="#">2017 年 3 月</a>-->
+                <!--</li>-->
+                <!--</ul>-->
+                <!--</div>-->
 
 
                 <div class="widget widget-tag-cloud">
                     <h3 class="widget-title">标签云</h3>
-                    <ul>
-                        <li>
-                            <a href="#">标签1</a>
-                        </li>
-                        <li>
-                            <a href="#">标签2</a>
-                        </li>
-                        <li>
-                            <a href="#">标签3</a>
-                        </li>
-                        <li>
-                            <a href="#">标签4</a>
-                        </li>
-                        <li>
-                            <a href="#">标签5</a>
-                        </li>
-                        <li>
-                            <a href="#">标签6</a>
-                        </li>
-                        <li>
-                            <a href="#">标签7</a>
-                        </li>
-                        <li>
-                            <a href="#">标签8</a>
-                        </li>
-                        <li>
-                            <a href="#">标签9</a>
-                        </li>
-                        <li>
-                            <a href="#">标签10</a>
-                        </li>
-                        <li>
-                            <a href="#">标签8</a>
-                        </li>
-                        <li>
-                            <a href="#">标签9</a>
-                        </li>
-                        <li>
-                            <a href="#">标签10</a>
-                        </li>
-                    </ul>
+                    <div class="zzsc-container">
+                        <div id='tag-cloud'></div>
+                    </div>
                 </div>
 
             </aside>
