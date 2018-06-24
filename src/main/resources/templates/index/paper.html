@@ -3,7 +3,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-<title>Black &amp; White</title>
+<title>实验室成果管理系统</title>
 
     <!-- meta -->
     <meta charset="UTF-8">
@@ -108,7 +108,7 @@
             <main class="col-md-8">
                 <article class="post post-1">
                     <header class="entry-header">
-                        <h1 class="entry-title" th:text="${paper.papername}"></h1>
+                        <h1 class="entry-title" th:text="${#strings.substringBefore(paper.papername,'.')}" ></h1>
                         <div class="entry-meta">
                             <span class="post-category"><a href="#" th:text="${paper.publish}"></a></span>
                             <!--<span class="post-date"><a href="#"><time class="entry-date"-->
@@ -125,7 +125,7 @@
                         <blockquote><p th:text="${paper.paperdesc}"></p>
                         </blockquote>
                         <h3>引文</h3>
-                        <p th:each="reference,ref_ind:${paper.references}"><span th:text="${ref_ind.index+1+'.'}"></span><a th:text="${#strings.substringBefore(reference.referencename,'.')}"  ></a><span th:text="${ref_tag.tag+';'}" th:each="ref_tag:${reference.tags}"></span></p>
+                        <p th:each="reference,ref_ind:${paper.references}"><span th:text="${ref_ind.index+1+'.'}"></span><a th:href="@{${reference.url}}" th:text="${#strings.substringBefore(reference.referencename,'.')}"  ></a><span th:text="${ref_tag.tag+';'}" th:each="ref_tag:${reference.tags}"></span></p>
 
                     </div>
                 </article>

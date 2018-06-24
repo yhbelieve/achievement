@@ -109,6 +109,13 @@
     <div class="container">
         <div class="row">
             <main class="col-md-8">
+                <article class="post post-4" th:if="${paperList.size()==0}">
+                    <header class="entry-header">
+                        <h1 class="entry-title">
+                            <a href="#">未找到该标签对应的论文成果，原因为该标签为引文中的标签</a>
+                        </h1>
+                    </header>
+                </article>
                 <article class="post post-1" th:each="paper,state:${paperList}" th:if="${paper.isshow==1}">
                     <header class="entry-header">
                         <span class="comments-link" th:text="${state.index+1}"></span>
